@@ -85,7 +85,8 @@ public class CharacterController2D : MonoBehaviour
             {
                 transform.Translate(colliderDistance.pointA - colliderDistance.pointB);
 
-                // If we intersect an object beneath us, set grounded to true. 
+                    // If we intersect an object beneath us, set grounded to true. 
+                Debug.Log(Vector2.Angle(colliderDistance.normal, Vector2.up));
                 if (Vector2.Angle(colliderDistance.normal, Vector2.up) < 90 && velocity.y < 0)
                 {
                     grounded = true;

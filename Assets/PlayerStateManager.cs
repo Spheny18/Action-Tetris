@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
+//TODO remove the scenemanagement and add a real death to this game;
 public class PlayerStateManager : MonoBehaviour
 {
     State curState;
@@ -23,15 +24,16 @@ public class PlayerStateManager : MonoBehaviour
         // Debug.Log("pre switch: " + curState);
         switch (curState){
             case State.Move:
-                curState = move.normalMove();
-               
+                curState = move.normalMove();   
                 break;
-            
             case State.Airborne:
                 curState = move.airMove();
                 break;
             case State.WallSlide:
-
+                curState = move.wallMove();
+                break;
+            case State.Die:
+                Scene scene = SceneManager.GetActiveScene(); SceneManager.LoadScene(scene.name);                
                 break;
         }
     }
@@ -53,5 +55,6 @@ public class PlayerStateManager : MonoBehaviour
 public enum State{
     Move,
     Airborne,
-    WallSlide
+    WallSlide,
+    Die
 }
