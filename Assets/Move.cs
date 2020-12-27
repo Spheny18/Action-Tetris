@@ -97,14 +97,16 @@ public class Move : MonoBehaviour
         } else if(collisions["grounded"]){
             return State.Move;
         } else {
-            if(collisions["wallSlide"]){
-                return State.WallSlide;
+            if(collisions["wallSlideL"]){
+                return State.WallSlideL;
+            } else if (collisions["wallSlideR"]){
+                return State.WallSlideR;
             }
             return State.Airborne;
         }
     }
 
-    public State wallMove(){
+    public State wallMove(int direction){
 
         bool jumping = false;
         float gravity = wallGravity;
@@ -120,7 +122,7 @@ public class Move : MonoBehaviour
 
         if(Input.GetButtonDown("Jump")){
             velocity.y = Mathf.Sqrt(2 * wallJumpHeight * Mathf.Abs(jumpingGravity));
-            velocity.x = Mathf.Sqrt(2 * wallJumpKick * Mathf.Abs(jumpingGravity));
+            velocity.x = Mathf.Sqrt(2 * wallJumpKick * Mathf.Abs(jumpingGravity)) * direction;
 
             jumping = true;
         }
@@ -137,15 +139,18 @@ public class Move : MonoBehaviour
         } else if(collisions["grounded"]){
             return State.Move;
         } else {
-            if(collisions["wallSlide"]){
-                return State.WallSlide;
+            if(collisions["wallSlideL"]){
+                return State.WallSlideL;
+            } else if (collisions["wallSlideR"]){
+                return State.WallSlideR;
             }
             return State.Airborne;
         }
     }
 
     Dictionary<string,bool> Collisions(){
-        bool wallSlide = false;
+        bool wallSlideL = false;
+        bool wallSlideR = false;
         bool grounded = false;
         bool topCollision = false;
         var map = new Dictionary<string,bool>();
@@ -159,12 +164,15 @@ public class Move : MonoBehaviour
             if (colliderDistance.isOverlapped)
             {
                 transform.Translate(colliderDistance.pointA - colliderDistance.pointB);
-                // Debug.Log(Vector2.Angle(colliderDistance.normal, Vector2.up));
+                // Debug.Log(Vector2.SignedAngle(colliderDistance.normal, Vector2.up));
                 if(Vector2.Angle(colliderDistance.normal, Vector2.up) == 180){
                     topCollision = true;
                 }
-                if(Vector2.Angle(colliderDistance.normal, Vector2.up) == 90){
-                    wallSlide = true;
+                if(Vector2.SignedAngle(colliderDistance.normal, Vector2.up) == 90){
+                    wallSlideL = true;
+                }
+                if(Vector2.SignedAngle(colliderDistance.normal, Vector2.up) == -90){
+                    wallSlideR = true;
                 }
                 if (Vector2.Angle(colliderDistance.normal, Vector2.up) < 90 && velocity.y < 0)
                 {
@@ -173,7 +181,8 @@ public class Move : MonoBehaviour
             }
         }
         map.Add("grounded",grounded);
-        map.Add("wallSlide",wallSlide);
+        map.Add("wallSlideL",wallSlideL);
+        map.Add("wallSlideR",wallSlideR);
         map.Add("topCollision",topCollision);
         return map;
     }
@@ -191,11 +200,11 @@ public class Move : MonoBehaviour
             if(tmp.y != 0 && !jumping){
                 move.y = tmp.y;
             }
-            
+            //TODO This may not be the best implentation of this find a better way to do this later
             if(iterations > 0){
                 hit.collider.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
                 MoveRecursive(move, iterations-1, jumping);   
-                hit.collider.gameObject.layer = LayerMask.NameToLayer("Default");
+                hit.collider.gameObject.layer = LayerMask.NameToLayer("Ground");
             } else {
                 transform.Translate(move);
             }
@@ -203,4 +212,5 @@ public class Move : MonoBehaviour
             transform.Translate(velocity);
         }
     }
+    
 }

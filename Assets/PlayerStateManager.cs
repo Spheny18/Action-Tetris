@@ -7,21 +7,28 @@ public class PlayerStateManager : MonoBehaviour
 {
     State curState;
     Move move;
+    Attack attack;
     // AttackManager attackMan;
     // bool attacked;
     void Start()
     {
         curState = State.Move;
         move = GetComponent<Move>();
-
-        //tryState = State
+        attack = GetComponent<Attack>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        // Vector2 attackInputs = getAttackInputs();
-        // Debug.Log("pre switch: " + curState);
+        switch (curState)
+        {
+            case State.Move:
+
+                break;
+            
+        }
+
+        //MoveMent Switch
         switch (curState){
             case State.Move:
                 curState = move.normalMove();   
@@ -29,8 +36,11 @@ public class PlayerStateManager : MonoBehaviour
             case State.Airborne:
                 curState = move.airMove();
                 break;
-            case State.WallSlide:
-                curState = move.wallMove();
+            case State.WallSlideL:
+                curState = move.wallMove(1);
+                break;
+            case State.WallSlideR:
+                curState = move.wallMove(-1);
                 break;
             case State.Die:
                 Scene scene = SceneManager.GetActiveScene(); SceneManager.LoadScene(scene.name);                
@@ -55,6 +65,7 @@ public class PlayerStateManager : MonoBehaviour
 public enum State{
     Move,
     Airborne,
-    WallSlide,
+    WallSlideL,
+    WallSlideR,
     Die
 }
